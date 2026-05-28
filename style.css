@@ -1,0 +1,24 @@
+body {
+  background: #0f0f1a;
+  display: flex; justify-content: center; align-items: center; min-height: 100vh;
+}
+.calc {
+  width: 300px; border-radius: 24px; overflow: hidden;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.display { background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.08); }
+.display .expr   { color: rgba(255,255,255,0.35); }
+.display .result { color: #fff; }
+.keys { gap: 10px; padding: 14px; }
+.key { border-radius: 14px; transition: transform 0.1s, filter 0.1s; }
+.key:hover  { filter: brightness(1.15); }
+.key:active { transform: scale(0.93); }
+
+.key.num   { background: #2a2d4a; color: #e8eaf6; }
+.key.clear { background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: #fff; }
+.key.sign  { background: linear-gradient(135deg, #a29bfe, #6c5ce7); color: #fff; }
+.key.pct   { background: linear-gradient(135deg, #fd79a8, #e84393); color: #fff; }
+.key.op    { background: linear-gradient(135deg, #fdcb6e, #e17055); color: #fff; }
+.key.equals{ background: linear-gradient(135deg, #00cec9, #0984e3); color: #fff; }
