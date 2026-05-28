@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { display: flex; justify-content: center; align-items: center;
+           min-height: 100vh; background: #f0f0f0; font-family: sans-serif; }
+
+    .calc { background: #fff; border-radius: 16px; width: 300px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12); overflow: hidden; }
+
+    .display { background: #f5f5f5; padding: 1.5rem 1.25rem 1rem; text-align: right;
+               border-bottom: 1px solid #e0e0e0; }
+    .display .expr { font-size: 13px; color: #999; min-height: 18px; }
+    .display .result { font-size: 36px; font-weight: 500; color: #111;
+                       overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .keys { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .key { border: none; border-right: 1px solid #e8e8e8; border-bottom: 1px solid #e8e8e8;
+           background: #fff; color: #111; font-size: 16px; padding: 18px 0;
+           cursor: pointer; transition: background 0.1s; }
+    .key:nth-child(4n) { border-right: none; }
+    .key:hover  { background: #f5f5f5; }
+    .key:active { background: #ececec; transform: scale(0.96); }
+
+    .key.op    { color: #185FA5; font-weight: 500; }
+    .key.clear { color: #A32D2D; font-weight: 500; }
+    .key.equals { background: #185FA5; color: #fff; font-weight: 500; }
+    .key.equals:hover { background: #0C447C; }
+    .key.zero { grid-column: span 2; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="calc">
+    <div class="display">
+      <div class="expr" id="expr"></div>
+      <div class="result" id="result">0</div>
+    </div>
+    <div class="keys" id="keys">
+      <button class="key clear" data-val="C">C</button>
+      <button class="key op"    data-val="+/-">+/-</button>
+      <button class="key op"    data-val="%">%</button>
+      <button class="key op"    data-val="/">÷</button>
+      <button class="key"       data-val="7">7</button>
+      <button class="key"       data-val="8">8</button>
+      <button class="key"       data-val="9">9</button>
+      <button class="key op"    data-val="*">×</button>
+      <button class="key"       data-val="4">4</button>
+      <button class="key"       data-val="5">5</button>
+      <button class="key"       data-val="6">6</button>
+      <button class="key op"    data-val="-">−</button>
+      <button class="key"       data-val="1">1</button>
+      <button class="key"       data-val="2">2</button>
+      <button class="key"       data-val="3">3</button>
+      <button class="key op"    data-val="+">+</button>
+      <button class="key zero"  data-val="0">0</button>
+      <button class="key"       data-val=".">.</button>
+      <button class="key equals" data-val="=">=</button>
+    </div>
+  </div>
+
+  <script>
+    let expr = '', justEvaled = false;
+    const exprEl   = document.getElementById('expr');
+    const resultEl = document.getElementById('result');
+
+    function display(val) {
+      resultEl.textContent = val.length > 12
+        ? parseFloat(val).toExponential(4) : val;
+    }
+
+    document.getElementById('keys').addEventListener('click', e => {
+      const btn = e.target.closest('[data-val]');
+      if (!btn) return;
+      const val = btn.dataset.val;
+      const ops = ['+', '-', '*', '/'];
+
+      if (val === 'C') {
+        expr = ''; justEvaled = false;
+        exprEl.textContent = ''; display('0'); return;
+      }
+      if (val === '+/-') {
+        if (!expr || expr === '0') return;
+        expr = expr.startsWith('-') ? expr.slice(1) : '-' + expr;
+        display(expr); return;
+      }
+      if (val === '%') {
+        const v = parseFloat(expr);
+        if (!isNaN(v)) { expr = String(v / 100); display(expr); } return;
+      }
+      if (val === '=') {
+        if (!expr) return;
+        try {
+          const safe = expr.replace(/[^0-9+\-*/.()]/g, '');
+          const res  = Function('"use strict"; return (' + safe + ')')();
+          if (!isFinite(res)) { display('Error'); expr = ''; return; }
+          const rounded = parseFloat(res.toPrecision(12));
+          exprEl.textContent = expr + ' =';
+          expr = String(rounded);
+          display(expr); justEvaled = true;
+        } catch { display('Error'); expr = ''; }
+        return;
+      }
+      if (ops.includes(val)) {
+        justEvaled = false;
+        if (expr === '' && val === '-') { expr = '-'; display('-'); return; }
+        if (!expr) return;
+        if (ops.includes(expr.slice(-1))) expr = expr.slice(0, -1);
+        expr += val;
+        exprEl.textContent = '';
+        display(val === '*' ? '×' : val === '/' ? '÷' : val === '-' ? '−' : val);
+        return;
+      }
+      if (val === '.') {
+        const last = expr.split(/[+\-*/]/).pop();
+        if (last.includes('.')) return;
+      }
+      if (justEvaled && !ops.includes(val)) { expr = ''; justEvaled = false; }
+      exprEl.textContent = '';
+      expr += val;
+      display(expr);
+    });
+  </script>
+</body>
+</html>
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
